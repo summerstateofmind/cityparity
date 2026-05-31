@@ -1,0 +1,17 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.summerstateofmind/cityparity",
+  "title": "cityparity — Cost-of-Living & Quality-of-Life Comparison",
+  "description": "Cost-of-living & quality-of-life comparison: take-home pay, equivalent salary, safety-net deltas.",
+  "repository": {
+    "url": "https://github.com/summerstateofmind/cityparity",
+    "source": "github"
+  },
+  "version": "0.1.0",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://mcp.cityparity.com/mcp"
+    }
+  ]
+}
