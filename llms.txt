@@ -1,0 +1,54 @@
+# cityparity MCP server
+
+Cost-of-living and quality-of-life tools that AI agents can call. Hosted at https://mcp.cityparity.com (subdomain of cityparity.com). MCP spec 2025-06-18, Streamable HTTP transport.
+
+## Endpoint
+
+- MCP: https://mcp.cityparity.com/mcp (POST + GET, JSON-RPC 2.0)
+- REST: https://mcp.cityparity.com/api/v1/* (mirror, OpenAPI 3.0)
+- OpenAPI: https://mcp.cityparity.com/openapi.json
+
+No authentication required. Edge rate-limited at 100 requests / 60 seconds per IP and URL path.
+
+## Tools
+
+- compare_cities. Full scenario comparison between two cities. Take-home pay, full cost breakdown (housing, healthcare, childcare, food, transit, discretionary, travel-home, property tax), equivalent target salary solved so target net cash matches source net cash, non-cash lifestyle deltas (vacation, parental leave, healthcare), quality score across five dimensions. Required args: source_city, target_city, gross_salary. Optional groups: household (has_partner, partner_gross_salary, partner_works_in_source, partner_works_in_target, kids_ages), living (housing_mode, bedrooms, lifestyle), advanced (retirement_contrib_pct, age_bracket, trips_home_per_year, transit choices, apply_inbound_regime).
+
+- list_cities. Discover supported city slugs grouped by country. Optional country filter.
+
+- get_city_summary. One-city profile: tax shape (bracket count, top marginal rate, payroll/NI/medicare), headline costs (rent by bedroom, groceries, transit, childcare tiers, subsidies), safety-net values, inbound regime presence, data year range. Required arg: city slug.
+
+- rank_cities. Top N cities by composite QoL score. Custom weights. Filters: country, countries[], region (europe/asia/north_america/south_america/oceania), has_universal_healthcare, include_cities, exclude_cities. Same scenario applied uniformly so scores are comparable. Default scenario: single person, 2BR rent, $100k USD-equivalent gross.
+
+- get_safety_net. Parental leave weeks + paid percentage, universal healthcare flag, vacation days, public holidays for 1-20 cities. Includes safety_net dimension score (0-100). Required arg: cities[].
+
+- get_inbound_tax_regime. Inbound-worker tax regime details for cities whose country has one. Modeled: Italy impatriati, Portugal IFICI, Belgium expat, Poland B2B ryczałt, Greece inbound. Required arg: city slug.
+
+## Design notes for agents
+
+- City slugs are kebab-case (e.g. "san-francisco", "hong-kong"). Always call list_cities first if unsure.
+- RSU income is intentionally NOT a parameter on any tool. Grants are treated as source-only because they don't follow you across employers. If the user has significant RSU, mention that the math is directional in that direction.
+- When has_partner=true on compare_cities, partner_gross_salary AND partner_works_in_source AND partner_works_in_target are all required. These are opinionated parameters; cityparity does not silently default them because spouse-per-city working status materially changes the calculation.
+- All currency amounts are in the SOURCE city's local currency unless otherwise noted. compare_cities returns separate source/target objects each in their own currency, plus an fx_rate_source_to_target field in meta.
+- The text content block in every tool response is an LLM-readable summary; the structuredContent block has the full JSON. Use structuredContent for precise numbers.
+- Errors return content: [{ type: text, text: message }] with isError: true. The message text explains what to do (e.g. "call list_cities to see valid slugs").
+
+## Methodology
+
+Full methodology at https://cityparity.com/#methodology. Key principles:
+- Tax math uses actual progressive bracket structures plus payroll contributions per country (US Social Security + Medicare, UK NI, Norway Trygdeavgift, etc.).
+- Cost-of-living uses city-median values (rent by bedroom, groceries/dining baselines, transit, etc.).
+- Childcare uses age-tiered monthly costs minus government subsidies where applicable.
+- Healthcare distinguishes universal-coverage countries from US-style premium-plus-deductible systems because variance matters as much as average.
+- Safety-net score = parental_leave_weeks * paid_pct / 52 * 50 + 50 if universal_healthcare; capped at 100. Doesn't include unemployment / disability / retirement (most developed countries have these).
+- Financial score normalizes to USD vs an $80,000 benchmark so it's comparable across currencies.
+
+## Versioning + spec compatibility
+
+- Protocol version negotiated: 2025-06-18.
+- Server version: 0.1.0 (early; expect schema additions, not breaking changes, within 0.x).
+- The MCP server identifies as serverInfo: { name: "cityparity", version: "0.1.0" }.
+
+## Contact
+
+Feedback, bug reports, city requests: https://cityparity.com/contact/

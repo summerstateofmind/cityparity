@@ -1,0 +1,4 @@
+#!/usr/bin/env node
+// npm bin entry. Dynamic import works whether Node parses this
+// extensionless file as ESM or CJS, so the bin is robust across setups.
+import('./cityparity-mcp.mjs');
