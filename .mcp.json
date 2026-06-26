@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "cityparity": {
+      "type": "streamable-http",
+      "url": "https://mcp.cityparity.com/mcp"
+    }
+  }
+}

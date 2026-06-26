@@ -1,0 +1,9 @@
+{
+  "name": "cityparity",
+  "version": "0.1.0",
+  "description": "Compare 165 cities on take-home pay and the safety net (childcare, healthcare, vacation, parental leave), not just rent and groceries.",
+  "homepage": "https://cityparity.com",
+  "author": { "name": "cityparity", "url": "https://cityparity.com" },
+  "keywords": ["finance", "cost-of-living", "relocation", "salary", "take-home-pay", "mcp"],
+  "logo": "https://raw.githubusercontent.com/summerstateofmind/cityparity/main/cityparity-logo-400.png"
+}
