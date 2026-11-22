@@ -4,4 +4,6 @@
 FROM node:20-alpine
 WORKDIR /app
 COPY . .
+# Run as the unprivileged user the node image ships with, not root.
+USER node
 ENTRYPOINT ["node", "bin/cityparity-mcp.mjs"]
